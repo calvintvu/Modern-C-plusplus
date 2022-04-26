@@ -1,3 +1,6 @@
+// Calvin Vu
+// Lab 1: Morse Decryption
+// CIS29
 #include <fstream>
 #include <vector>
 #include <iostream>
@@ -8,12 +11,10 @@ using namespace std;
 class File{
     private:
         vector<char> rawdata;
-        string binary;
     public:
         void readFile(string f);
         string convert();
         vector<char> getData(){return rawdata;}
-        string getBinary(){return binary;}
 };
 void File::readFile(string f){ 
     ifstream in;
@@ -28,14 +29,6 @@ void File::readFile(string f){
     }
     in.close();
 }
-string File::convert(){
-    binary = "";
-    for(int i = 0; i<rawdata.size();i++){
-        binary.append(bitset<8>(rawdata.at(i)).to_string());
-    }
-    return binary;
-}
-
 class Database{
     private:
         string result;
@@ -97,6 +90,7 @@ class Process{
         }
         void decrypt(Database& d);
         string get(){return decrypted;}
+        string convert(vector<char> v);
 };
 void Process::decrypt(Database& d){
     string b = d.getBinary();
@@ -108,13 +102,13 @@ void Process::decrypt(Database& d){
             temp = "";
         }
         else if(temp == "00" || temp == "11"){
-            if(temp == "11"){decrypted+=" ";}
+            if(temp == "11"){decrypted += " ";}
             else{
                 for (auto&& tuple: charList){
-                    char X;
-                    string Y;
-                    tie(X, Y) = tuple;
-                    if( Y == currentLetterBinary){decrypted += X;}
+                    char letter;
+                    string binary;
+                    tie(letter, binary) = tuple;
+                    if( binary == currentLetterBinary){decrypted += letter;}
                 }
             }   
             currentLetterBinary = "";
@@ -123,35 +117,21 @@ void Process::decrypt(Database& d){
     }
     d.setResult(decrypted);
 }
+string Process::convert(vector<char> v){
+    string binary = "";
+    for(int i = 0; i<v.size();i++){
+        binary.append(bitset<8>(v.at(i)).to_string());
+    }
+    return binary;
+}
 
 class Output{
     private:
     public:
         void print(string s){
-            cout << s;
+            cout << "Decrypted Text: " << endl << s;
         }
 };
-
-void hexdump(void *ptr, int buflen)
-{
-   unsigned char *buf = (unsigned char*)ptr;
-   int i, j;
-   for (i=0; i<buflen; i+=16) {
-      printf("%06x: ", i);
-      for (j=0; j<16; j++) { 
-         if (i+j < buflen)
-            printf("%02x ", buf[i+j]);
-         else
-            printf("   ");
-      }
-      printf(" ");
-      for (j=0; j<16; j++) {
-         if (i+j < buflen)
-            printf("%c", isprint(buf[i+j]) ? buf[i+j] : '.');
-      }
-      printf("\n");
-   }
-}
 
 int main(){
     File f;
@@ -159,8 +139,7 @@ int main(){
     Process p;
     Output o;
     f.readFile("morse.bin");
-    // hexdump(f.getData().data(),f.getData().size());
-    d.setBinary(f.convert());
+    d.setBinary(p.convert(f.getData()));
     p.decrypt(d);
     o.print(d.getResult());
 }
