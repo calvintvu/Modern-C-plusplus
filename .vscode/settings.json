@@ -5,6 +5,8 @@
         "vector": "cpp",
         "utility": "cpp",
         "tuple": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "memory": "cpp",
+        "iosfwd": "cpp"
     }
 }
