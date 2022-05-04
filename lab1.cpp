@@ -44,7 +44,7 @@ class Database{
 
 class Process{
     private:
-        unique_ptr<vector<tuple<char, string>>> morseKey;
+        unique_ptr<vector<tuple<char, string>>> morseKey; //smart pointer
         string decrypted;
     public:
         Process(){
