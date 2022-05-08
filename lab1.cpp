@@ -3,12 +3,14 @@
 // CIS29
 // C++17
 #include <fstream>
+#include <string>
 #include <vector>
 #include <iostream>
 #include <algorithm>
 #include <tuple>
 #include <memory>
 #include <utility>
+#include <bitset>
 using namespace std;
 
 class File{
@@ -33,19 +35,20 @@ void File::readFile(string f){
 }
 class Database{
     private:
-        string result;
-        string binary;
+        vector<char> data;
+        vector<char> result;
     public:
-        void setBinary(string b){binary = b;}
-        string getBinary(){return binary;}
-        void setResult(string r){result = r;}
-        string getResult(){return result;}
+        void setData(vector<char> d){data = d;}
+        vector<char> getData(){return data;}
+        void setResult(vector<char> r){result = r;}
+        vector<char> getResult(){return result;}
 };
 
 class Process{
     private:
+        enum bits{zero_one=0b00000001, one_zero=0b00000010, zero_zero=0b000000000, one_one=0b00000011};
         unique_ptr<vector<tuple<char, string>>> morseKey; //smart pointer
-        string decrypted;
+        vector<char> decrypted;
     public:
         Process(){
             morseKey = make_unique<vector<tuple<char, string>>>();
@@ -92,46 +95,48 @@ class Process{
             morseKey->push_back(make_tuple(' ', "11"));
         }
         void decrypt(Database& d);
-        string get(){return decrypted;}
-        string convert(vector<char> v);
+        void search(string binchar);
+        vector<char> get(){return decrypted;}
 };
 void Process::decrypt(Database& d){
-    string b = d.getBinary();
-    string temp, currentLetterBinary;
-    for(int i = 0; i < b.length(); i++){
-        temp += b[i];
-        if((temp.length() >= 2) && (temp != "00") && (temp != "11")){
-            currentLetterBinary += temp;
-            temp = "";
+    string binchar ="";
+    bitset<8> bit_limiter(0b00000011);
+    vector<char> encryptedstring = d.getData();
+    for(int i=0;i<encryptedstring.size();i++){
+        bitset<8> temp (encryptedstring.at(i));
+        int index = 6;
+        for(int j=0;j<4;j++){
+            bitset<8> retrieve(((temp>>index)&(bit_limiter)));
+            if(retrieve==zero_one){binchar+="01";}
+            else if(retrieve==one_zero){binchar+="10";}
+            else if(retrieve==zero_zero){
+                search(binchar);
+                binchar.clear();
+            }
+            else if(retrieve==one_one){
+                decrypted.push_back(' ');
+                binchar.clear();
+            }
+            index-=2;
         }
-        else if(temp == "00" || temp == "11"){
-            if(temp == "11"){decrypted += " ";}
-            else{
-                for (auto&& tuple: *morseKey){
-                    char letter;
-                    string binary;
-                    tie(letter, binary) = tuple;
-                    if(binary == currentLetterBinary){decrypted += letter;}
-                }
-            }   
-            currentLetterBinary = "";
-            temp = "";
-        }    
     }
     d.setResult(decrypted);
 }
-string Process::convert(vector<char> v){
-    string binary = "";
-    for(int i=0; i<v.size();i++){
-        binary.append(bitset<8>(v.at(i)).to_string());
+void Process::search(string binchar){
+    for (auto&& tuple: *morseKey){
+        char letter;
+        string binary;
+        tie(letter, binary) = tuple;
+        if(binary == binchar){decrypted.push_back(letter);}
     }
-    return binary;
 }
 
 class Output{
     private:
     public:
-        void print(string s){cout << "Decoded Text:\n" << s;}
+        void print(vector<char> s){
+            for(int i=0;i<s.size();i++){cout<<s.at(i);}
+        }
 };
 
 int main(){
@@ -140,7 +145,11 @@ int main(){
     Process p;
     Output o;
     f.readFile("Morse.bin");
-    d.setBinary(p.convert(f.getData()));
+    d.setData(f.getData());
     p.decrypt(d);
     o.print(d.getResult());
+    // bitset<8> x ('R');
+    // bitset<8> y("00000011");
+    // bitset<8> z(((x>>0)&(y)));
+    // cout << (z) << endl;
 }
