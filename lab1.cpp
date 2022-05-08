@@ -47,55 +47,55 @@ class Database{
 class Process{
     private:
         enum bits{zero_one=0b00000001, one_zero=0b00000010, zero_zero=0b000000000, one_one=0b00000011};
-        unique_ptr<vector<tuple<char, string>>> morseKey; //smart pointer
+        unique_ptr<vector<tuple<char, bitset<12>>>> morseKey; //smart pointer
         vector<char> decrypted;
     public:
         Process(){
-            morseKey = make_unique<vector<tuple<char, string>>>();
-            morseKey->push_back(make_tuple('A', "1001"));
-            morseKey->push_back(make_tuple('B', "01101010"));
-            morseKey->push_back(make_tuple('C', "01100110"));
-            morseKey->push_back(make_tuple('D', "011010"));
-            morseKey->push_back(make_tuple('E', "10"));
-            morseKey->push_back(make_tuple('F', "10100110"));
-            morseKey->push_back(make_tuple('G', "010110"));
-            morseKey->push_back(make_tuple('H', "10101010"));
-            morseKey->push_back(make_tuple('I', "1010"));
-            morseKey->push_back(make_tuple('J', "10010101"));
-            morseKey->push_back(make_tuple('K', "011001"));
-            morseKey->push_back(make_tuple('L', "10011010"));
-            morseKey->push_back(make_tuple('M', "0101"));
-            morseKey->push_back(make_tuple('N', "0110"));
-            morseKey->push_back(make_tuple('O', "010101"));
-            morseKey->push_back(make_tuple('P', "10010110"));
-            morseKey->push_back(make_tuple('Q', "01011001"));
-            morseKey->push_back(make_tuple('R', "100110"));
-            morseKey->push_back(make_tuple('S', "101010"));
-            morseKey->push_back(make_tuple('T', "01"));
-            morseKey->push_back(make_tuple('U', "101001"));
-            morseKey->push_back(make_tuple('V', "10101001"));
-            morseKey->push_back(make_tuple('W', "100101"));
-            morseKey->push_back(make_tuple('X', "01101001"));
-            morseKey->push_back(make_tuple('Y', "01100101"));
-            morseKey->push_back(make_tuple('Z', "01011010"));
-            morseKey->push_back(make_tuple('0', "0101010101"));
-            morseKey->push_back(make_tuple('1', "1001010101"));
-            morseKey->push_back(make_tuple('2', "1010010101"));
-            morseKey->push_back(make_tuple('3', "1010100101"));
-            morseKey->push_back(make_tuple('4', "1010101001"));
-            morseKey->push_back(make_tuple('5', "1010101010"));
-            morseKey->push_back(make_tuple('6', "0110101010"));
-            morseKey->push_back(make_tuple('7', "0101101010"));
-            morseKey->push_back(make_tuple('8', "0101011010"));
-            morseKey->push_back(make_tuple('9', "0101010110"));
-            morseKey->push_back(make_tuple('.', "100110011001"));
-            morseKey->push_back(make_tuple(',', "010110100101"));
-            morseKey->push_back(make_tuple('"', "100110100110"));
-            morseKey->push_back(make_tuple('\'',"100101010110"));
-            morseKey->push_back(make_tuple(' ', "11"));
+            morseKey = make_unique<vector<tuple<char, bitset<12>>>>();
+            morseKey->push_back(make_tuple('A', bitset<12>("1001")));
+            morseKey->push_back(make_tuple('B', bitset<12>("01101010")));
+            morseKey->push_back(make_tuple('C', bitset<12>("01100110")));
+            morseKey->push_back(make_tuple('D', bitset<12>("011010")));
+            morseKey->push_back(make_tuple('E', bitset<12>("10")));
+            morseKey->push_back(make_tuple('F', bitset<12>("10100110")));
+            morseKey->push_back(make_tuple('G', bitset<12>("010110")));
+            morseKey->push_back(make_tuple('H', bitset<12>("10101010")));
+            morseKey->push_back(make_tuple('I', bitset<12>("1010")));
+            morseKey->push_back(make_tuple('J', bitset<12>("10010101")));
+            morseKey->push_back(make_tuple('K', bitset<12>("011001")));
+            morseKey->push_back(make_tuple('L', bitset<12>("10011010")));
+            morseKey->push_back(make_tuple('M', bitset<12>("0101")));
+            morseKey->push_back(make_tuple('N', bitset<12>("0110")));
+            morseKey->push_back(make_tuple('O', bitset<12>("010101")));
+            morseKey->push_back(make_tuple('P', bitset<12>("10010110")));
+            morseKey->push_back(make_tuple('Q', bitset<12>("01011001")));
+            morseKey->push_back(make_tuple('R', bitset<12>("100110")));
+            morseKey->push_back(make_tuple('S', bitset<12>("101010")));
+            morseKey->push_back(make_tuple('T', bitset<12>("01")));
+            morseKey->push_back(make_tuple('U', bitset<12>("101001")));
+            morseKey->push_back(make_tuple('V', bitset<12>("10101001")));
+            morseKey->push_back(make_tuple('W', bitset<12>("100101")));
+            morseKey->push_back(make_tuple('X', bitset<12>("01101001")));
+            morseKey->push_back(make_tuple('Y', bitset<12>("01100101")));
+            morseKey->push_back(make_tuple('Z', bitset<12>("01011010")));
+            morseKey->push_back(make_tuple('0', bitset<12>("0101010101")));
+            morseKey->push_back(make_tuple('1', bitset<12>("1001010101")));
+            morseKey->push_back(make_tuple('2', bitset<12>("1010010101")));
+            morseKey->push_back(make_tuple('3', bitset<12>("1010100101")));
+            morseKey->push_back(make_tuple('4', bitset<12>("1010101001")));
+            morseKey->push_back(make_tuple('5', bitset<12>("1010101010")));
+            morseKey->push_back(make_tuple('6', bitset<12>("0110101010")));
+            morseKey->push_back(make_tuple('7', bitset<12>("0101101010")));
+            morseKey->push_back(make_tuple('8', bitset<12>("0101011010")));
+            morseKey->push_back(make_tuple('9', bitset<12>("0101010110")));
+            morseKey->push_back(make_tuple('.', bitset<12>("100110011001")));
+            morseKey->push_back(make_tuple(',', bitset<12>("010110100101")));
+            morseKey->push_back(make_tuple('"', bitset<12>("100110100110")));
+            morseKey->push_back(make_tuple('\'',bitset<12>("100101010110")));
+            morseKey->push_back(make_tuple(' ', bitset<12>("11")));
         }
         void decrypt(Database& d);
-        void search(string binchar);
+        void search(bitset<12> binchar);
         vector<char> get(){return decrypted;}
 };
 void Process::decrypt(Database& d){
@@ -110,7 +110,7 @@ void Process::decrypt(Database& d){
             if(retrieve==zero_one){binchar+="01";}
             else if(retrieve==one_zero){binchar+="10";}
             else if(retrieve==zero_zero){
-                search(binchar);
+                search(bitset<12>(binchar));
                 binchar.clear();
             }
             else if(retrieve==one_one){
@@ -122,10 +122,10 @@ void Process::decrypt(Database& d){
     }
     d.setResult(decrypted);
 }
-void Process::search(string binchar){
+void Process::search(bitset<12> binchar){
     for (auto&& tuple: *morseKey){
         char letter;
-        string binary;
+        bitset<12> binary;
         tie(letter, binary) = tuple;
         if(binary == binchar){decrypted.push_back(letter);}
     }
