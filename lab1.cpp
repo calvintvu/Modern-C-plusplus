@@ -46,7 +46,6 @@ class Database{
 
 class Process{
     private:
-        enum bits{zero_one=0b00000001, one_zero=0b00000010, zero_zero=0b000000000, one_one=0b00000011};
         unique_ptr<vector<tuple<char, bitset<12>>>> morseKey; //smart pointer
         bitset<8> bit_limiter=bitset<8>(0b00000011);
         vector<char> decrypted;
@@ -106,13 +105,13 @@ void Process::decrypt(Database& d){
         int index = 6;
         for(int j=0;j<4;j++){
             bitset<8> cut(((curr>>index)&(bit_limiter)));
-            if(cut==zero_one){binchar+="01";}
-            else if(cut==one_zero){binchar+="10";}
-            else if(cut==zero_zero){
+            if(cut==bitset<8>(0b00000001)){binchar+="01";}
+            else if(cut==bitset<8>(0b00000010)){binchar+="10";}
+            else if(cut==bitset<8>(0b00000000)){
                 search(bitset<12>(binchar));
                 binchar.clear();
             }
-            else if(cut==one_one){
+            else if(cut==bitset<8>(0b00000011)){
                 decrypted.push_back(' ');
                 binchar.clear();
             }
@@ -123,10 +122,10 @@ void Process::decrypt(Database& d){
 }
 void Process::search(bitset<12> binchar){
     for (auto&& tuple: *morseKey){
-        char letter;
+        char found;
         bitset<12> binary;
-        tie(letter, binary) = tuple;
-        if(binary == binchar){decrypted.push_back(letter);}
+        tie(found, binary) = tuple;
+        if(binary==binchar){decrypted.push_back(found);}
     }
 }
 
