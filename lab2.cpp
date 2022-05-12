@@ -22,7 +22,10 @@ class Branch: public Node{
         Node* left;
         Node* right;
     public:
-        Branch(Node* n0, Node* n1);
+        Branch(Node* n0, Node* n1){
+            left=n0;
+            right=n1;
+        };
         Node* getLeft(){return left;}
         Node* getRight(){return right;}
         double freq(){return left->freq()+right->freq();}
@@ -84,8 +87,21 @@ public:
 
 class QueueTree{
     private:
+        vector<Node*> f_tree;
+        vector<string> dec;
     public:
+        void priority_tree(vector<Node*> q);
 };
+void QueueTree::priority_tree(vector<Node*> q){
+    while(q.size() > 0){
+        Node* QLeft = q.at(0);
+        q.erase(q.begin());
+        Node* QRight = q.at(0);
+        q.erase(q.begin());
+        Branch* node = new Branch(QLeft, QRight);
+        f_tree.push_back(node);
+    }
+}
 
 class File{
     private:
@@ -102,8 +118,8 @@ void File::readText(string f){
         string line;
         while(getline(FileIn, line)){ 
             regex pattern("'(.*)',([0-9]+\\.?[0-9]*)");
-            std::smatch m;
-            while (std::regex_search (line,m,pattern)) {
+            smatch m;
+            while (regex_search (line,m,pattern)) {
                 for (auto x:m){
                     ascii=m[1];
                     if(ascii.length()>1){ascii.erase(0,1);}
@@ -143,5 +159,5 @@ int main(){
         Leaf* l = new Leaf(pair.first,pair.second);
         p.push(l); 
     }
-        p.print();
+        // p.print();
 }
