@@ -34,7 +34,7 @@ class Leaf: public Node{
         double _freq;
         string _symbol;
     public:
-        Leaf(string&s, double f){
+        Leaf(string s, double f){
             _freq=f;
             _symbol=s;
         }
@@ -63,6 +63,10 @@ public:
 			{
 				return a->symbol() < b->symbol();
 			});
+        // vector<Node*>::iterator itr = vdata.begin();
+        // while (itr!=vdata.end() && (*itr)->symbol() <= n->symbol()){
+        //     itr++;}
+        // vdata.insert(itr, n);
 	}
 	void pop()
 	{
@@ -97,12 +101,12 @@ void File::readText(string f){
     if (FileIn.is_open()){  
         string line;
         while(getline(FileIn, line)){ 
-            regex pattern("'(.*?)',([0-9]+\\.?[0-9]*)");
+            regex pattern("'(.*)',([0-9]+\\.?[0-9]*)");
             std::smatch m;
             while (std::regex_search (line,m,pattern)) {
                 for (auto x:m){
                     ascii=m[1];
-                    ascii.erase(1,2);
+                    if(ascii.length()>1){ascii.erase(0,1);}
                     frequency=m[2];
                 }
                 table.insert(make_pair(ascii,stod(frequency)));
@@ -119,7 +123,11 @@ class Data{
         void setTable(map<string,double> m){table=m;}
         map<string,double> get(){return table;}
         void print_map(){
-            for (auto const &pair: table){cout << pair.first << " " << pair.second << "\n";}
+            int i=0;
+            for (auto const &pair: table){
+                cout << i+1 << ") " << pair.first << " " << pair.second << "\n";
+                i++;
+            }
         }
 };
 
@@ -132,14 +140,8 @@ int main(){
     Priority_Queue p;
     map<string,double> m = d.get();
     for (auto const &pair: m){
-        string s=pair.first;
-        double d=pair.second;
-        Leaf l = Leaf(s,d);
-        Leaf* L = &l;
-        // cout<<L->symbol()<<L->freq()<<endl;
-        p.push(L);
-        L = NULL;
-        delete L;
+        Leaf* l = new Leaf(pair.first,pair.second);
+        p.push(l); 
     }
-    p.print();
+        p.print();
 }

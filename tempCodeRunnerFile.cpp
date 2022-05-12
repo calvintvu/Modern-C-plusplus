@@ -1,4 +1,6 @@
-    // cout << ((foo)) << '\n';   
-    // cout << ((bar)) << '\n'; 
-    // cout << ((foo>>=6)) << '\n';    
-    // cout << (foo & bar) << '\n';
+		vdata.push_back(n);
+		sort(vdata.begin(), vdata.end(),
+			[](Node* a, Node* b)
+			{
+				return a->symbol() < b->symbol();
+			});
