@@ -12,7 +12,7 @@ using namespace std;
 
 class Node{
     public:
-        Node();
+        Node(){}
         virtual double freq()=0;
         virtual string symbol()=0;
 };
@@ -26,6 +26,7 @@ class Branch: public Node{
         Node* getLeft(){return left;}
         Node* getRight(){return right;}
         double freq(){return left->freq()+right->freq();}
+        string symbol(){return left->symbol()+right->symbol();}
 };
 
 class Leaf: public Node{
@@ -72,7 +73,7 @@ public:
 		for_each(vdata.begin(), vdata.end(),
 			[](Node* n)
 			{
-				cout << n->symbol() << '\t' << n->freq() << endl;
+				cout << n->symbol() << ' ' << n->freq() << endl;
 			});
 	}
 };
@@ -84,15 +85,15 @@ class QueueTree{
 
 class File{
     private:
-        map<char,double> table;
+        map<string,double> table;
     public:
-        map<char,double> getTable(){return table;}
+        map<string,double> getTable(){return table;}
         void readText(string f);
         void readBin(string f);
 };
 void File::readText(string f){
     ifstream FileIn(f);
-    string ascii,frequency;;
+    string ascii,frequency;
     if (FileIn.is_open()){  
         string line;
         while(getline(FileIn, line)){ 
@@ -101,9 +102,10 @@ void File::readText(string f){
             while (std::regex_search (line,m,pattern)) {
                 for (auto x:m){
                     ascii=m[1];
+                    ascii.erase(1,2);
                     frequency=m[2];
                 }
-                table.insert(make_pair(ascii[0],stod(frequency)));
+                table.insert(make_pair(ascii,stod(frequency)));
                 line = m.suffix();
             }
         }
@@ -112,10 +114,10 @@ void File::readText(string f){
 
 class Data{
     private:
-        map<char,double> table;
+        map<string,double> table;
     public:
-        void setTable(map<char,double> m){table=m;}
-        map<char,double> get(){return table;}
+        void setTable(map<string,double> m){table=m;}
+        map<string,double> get(){return table;}
         void print_map(){
             for (auto const &pair: table){cout << pair.first << " " << pair.second << "\n";}
         }
@@ -128,11 +130,16 @@ int main(){
     d.setTable(f.getTable());
     // d.print_map();
     Priority_Queue p;
-    for (auto const &pair: d.get()){
-        string s(1, pair.first);
-        double d = pair.second;
+    map<string,double> m = d.get();
+    for (auto const &pair: m){
+        string s=pair.first;
+        double d=pair.second;
         Leaf l = Leaf(s,d);
         Leaf* L = &l;
+        // cout<<L->symbol()<<L->freq()<<endl;
         p.push(L);
+        L = NULL;
+        delete L;
     }
+    p.print();
 }
