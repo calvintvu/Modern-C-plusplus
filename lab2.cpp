@@ -49,6 +49,7 @@ class Priority_Queue
 {
 	vector<Node*> vdata;
 public:
+    vector<Node*> get(){return vdata;}
 	Priority_Queue() { }
 	Node* top()
 	{
@@ -60,16 +61,16 @@ public:
 	bool empty() { return vdata.size() < 1; }
 	void push(Node* n)
 	{
-		vdata.push_back(n);
-		sort(vdata.begin(), vdata.end(),
-			[](Node* a, Node* b)
-			{
-				return a->symbol() < b->symbol();
-			});
-        // vector<Node*>::iterator itr = vdata.begin();
-        // while (itr!=vdata.end() && (*itr)->symbol() <= n->symbol()){
-        //     itr++;}
-        // vdata.insert(itr, n);
+		// vdata.push_back(n);
+		// sort(vdata.begin(), vdata.end(),
+		// 	[](Node* a, Node* b)
+		// 	{
+		// 		return a->symbol() < b->symbol();
+		// 	});
+        vector<Node*>::iterator itr = vdata.begin();
+        while (itr!=vdata.end() && (*itr)->freq() <= n->freq()){
+            itr++;}
+        vdata.insert(itr, n);
 	}
 	void pop()
 	{
@@ -90,17 +91,23 @@ class QueueTree{
         vector<Node*> f_tree;
         vector<string> dec;
     public:
-        void priority_tree(vector<Node*> q);
+        void priority_tree(Priority_Queue p);
+        void encode();
 };
-void QueueTree::priority_tree(vector<Node*> q){
-    while(q.size() > 0){
-        Node* QLeft = q.at(0);
-        q.erase(q.begin());
-        Node* QRight = q.at(0);
-        q.erase(q.begin());
+void QueueTree::priority_tree(Priority_Queue p){
+    // f_tree=p.get();
+    do{
+        Node* QLeft = p.top();
+        p.pop();
+        Node* QRight = p.top();
+        p.pop();
         Branch* node = new Branch(QLeft, QRight);
-        f_tree.push_back(node);
+        p.push(node);
     }
+    while(p.get().size()>1);
+    // for(int i=0; i<p.get().size();i++){
+    //     cout << p.get().at(i)->freq() << p.get().at(i)->symbol();
+    // }
 }
 
 class File{
@@ -160,4 +167,7 @@ int main(){
         p.push(l); 
     }
         // p.print();
+    QueueTree t;
+    t.priority_tree(p);
+    // p.print();
 }
