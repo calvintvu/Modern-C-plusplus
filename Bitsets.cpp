@@ -68,18 +68,18 @@ struct Opcode{
 	friend bool operator < (Opcode& a, Opcode& b) { return a._bit < b._bit; }
 
 	template<class T>
-	void swap(T& a, T& b){
+	void swap(T& a, T& b){ //move semantics
 		T temp(std::move(a));
 		a = std::move(b);
 		b = std::move(temp);
 		cout << blue << "Swap!" << endl;
 	}
 };
-struct Test{
+struct Test{ // For Move Constructor
 	int* ptr;
 	Test(int* b){ptr=b;}
-	Test(Test&& t){
-		cout << blue << "Move constructor!" << endl;
+	Test(Test&& t){ //Move Semantics
+		cout << blue << "Move constructor!" << endl; 
 		this->ptr = t.ptr;
 		t.ptr= nullptr;
 	}
@@ -200,8 +200,7 @@ void Example0()
 	}
 }
 
-int main()
-{
+int main(){
 	// cout << white << "---0---\n";
 	// Example0();
 	// cout << white << "---1---\n";
