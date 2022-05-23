@@ -19,15 +19,15 @@ class Node{
 
 class Branch: public Node{
     private:
-        Node* left;
-        Node* right;
+        shared_ptr<Node> left;
+        shared_ptr<Node> right;
     public:
-        Branch(Node* n0, Node* n1){
+        Branch(shared_ptr<Node> n0, shared_ptr<Node> n1){
             left=n0;
             right=n1;
         };
-        Node* getLeft(){return left;}
-        Node* getRight(){return right;}
+        shared_ptr<Node> getLeft(){return left;}
+        shared_ptr<Node> getRight(){return right;}
         float freq(){return left->freq()+right->freq();}
         string symbol(){return left->symbol()+right->symbol();}
 };
@@ -47,11 +47,11 @@ class Leaf: public Node{
 
 class Priority_Queue
 {
-	vector<Node*> vdata;
+	vector<shared_ptr<Node>> vdata;
 public:
-    vector<Node*> get(){return vdata;}
+    vector<shared_ptr<Node>> get(){return vdata;}
 	Priority_Queue() { }
-	Node* top()
+	shared_ptr<Node> top()
 	{
 		if (vdata.size() > 0)
 			return vdata[0];
@@ -59,15 +59,15 @@ public:
 	}
 	int size() { return vdata.size(); }
 	bool empty() { return vdata.size() < 1; }
-	void push(Node* n)
+	void push(shared_ptr<Node> n)
 	{
 		// vdata.push_back(n);
 		// sort(vdata.begin(), vdata.end(),
-		// 	[](Node* a, Node* b)
+		// 	[](shared_ptr<Node> a, shared_ptr<Node> b)
 		// 	{
 		// 		return a->freq() < b->freq();
 		// 	});
-        vector<Node*>::iterator itr = vdata.begin();
+        vector<shared_ptr<Node>>::iterator itr = vdata.begin();
         while (itr!=vdata.end() && (*itr)->freq() <= n->freq()){
             itr++;}
         vdata.insert(itr, n);
@@ -79,7 +79,7 @@ public:
 	void print()
 	{
 		for_each(vdata.begin(), vdata.end(),
-			[](Node* n)
+			[](shared_ptr<Node> n)
 			{
 				cout << n->symbol() << ' ' << n->freq() << endl;
 			});
@@ -88,47 +88,46 @@ public:
 
 class QueueTree{
     private:
-        vector<Node*> f_tree;
-        vector<string> dec;
+        string solu;
     public:
         void priority_tree(Priority_Queue &p);
-        void encode(Priority_Queue q, string &b);
+        void encode(Priority_Queue q, string b);
+        string getsolu(){return solu;}
 };
 void QueueTree::priority_tree(Priority_Queue &p){
     do{
-        Node* QLeft = p.top();
+        shared_ptr<Node> QLeft = p.top();
         p.pop();
-        Node* QRight = p.top();
+        shared_ptr<Node> QRight = p.top();
         p.pop();
-        Branch* node = new Branch(QLeft, QRight);
+        shared_ptr<Branch> node = make_shared<Branch>(QLeft, QRight);
         p.push(node);
     }
     while(p.get().size()>1);
 }
-void QueueTree::encode(Priority_Queue q, string &b){
-    string sol ="";
-    Node* root = q.get()[0];
+void QueueTree::encode(Priority_Queue q, string b){
+    solu ="";
+    shared_ptr<Node> root = q.get()[0];
     for(int i=0;i<b.length();i++){
         if(b[i]=='0'){
             if(root->symbol().length() > 1){
-                root = dynamic_cast<Branch*>(root)->getLeft();
+                root = dynamic_pointer_cast<Branch>(root)->getLeft();
             }
             if(root->symbol().length()==1){
-                sol+=root->symbol();
+                solu+=root->symbol();
                 root = q.get()[0];
             }
         }
         if(b[i]=='1'){
             if(root->symbol().length() > 1){
-                root = dynamic_cast<Branch*>(root)->getRight();
+                root = dynamic_pointer_cast<Branch>(root)->getRight();
             }
             if(root->symbol().length()==1){
-                sol+=root->symbol();
+                solu+=root->symbol();
                 root = q.get()[0];
             }
         }
     }
-    cout << sol << endl;
 }
 
 class File{
@@ -179,8 +178,10 @@ class Data{
     private:
         map<string,float> table;
         string binary;
+        string solu;
     public:
         void setTable(map<string,float> m){table=m;}
+        void insertsolution(string s){solu = s;}
         string getBin(){return binary;}
         map<string,float> get(){return table;}
         void print_map(){
@@ -197,6 +198,7 @@ class Data{
             }
         }
         void printBin(){cout << binary << endl;}
+        void solution(){cout << solu << endl;}
 };
 
 int main(){
@@ -207,13 +209,13 @@ int main(){
     d.setTable(f.getTable());
     d.convert(f.getBin());
     Priority_Queue p;
-    map<string,float> m = d.get();
-    for (auto const &pair: m){
-        Leaf* l = new Leaf(pair.first,pair.second);
+    for (auto const &pair: d.get()){
+        shared_ptr<Leaf> l = make_shared<Leaf>(pair.first,pair.second);
         p.push(l); 
     }
     QueueTree t;
     t.priority_tree(p);
-    string str = d.getBin();
-    t.encode(p, str);
+    t.encode(p, d.getBin());
+    d.insertsolution(t.getsolu());
+    d.solution();
 }

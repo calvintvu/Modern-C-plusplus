@@ -74,15 +74,7 @@ struct Opcode{
 		b = std::move(temp);
 		cout << blue << "Swap!" << endl;
 	}
-};
-struct Test{ // For Move Constructor
-	int* ptr;
-	Test(int* b){ptr=b;}
-	Test(Test&& t){ //Move Semantics
-		cout << blue << "Move constructor!" << endl; 
-		this->ptr = t.ptr;
-		t.ptr= nullptr;
-	}
+	
 };
 
 struct Robot
@@ -136,7 +128,7 @@ void exampleRobot()
 	Robot robot;
 	robot.set("ON");
 	robot.set("LEFT");
-	robot.set("BACKWARDS");
+	robot.set("BACKWARD");
 	robot.execute();
 }
 
@@ -223,11 +215,5 @@ int main(){
 	cout << endl;
 	cout << green << "Object 2: " << p._bit << " " << p._text;
 
-	cout << white << "\n\nMove Constructor" << endl;
-	Test t = Test(new int(123456789));
-	cout << yellow << "Object 1: " << t.ptr << endl;
-	Test t_move = Test(std::move(t));
-	cout << yellow << "Object 1: " << t.ptr << endl;
-	cout << green << "New Object: " << t_move.ptr << endl;
 }
 
