@@ -1,2 +1,3 @@
-    // string binary_str("100001001");
-    // bitset<9> set(binary_str);  
+                for(int j=0;i<carts_line.at(i).getHexItems().size();j++){
+                    cout << carts_line.at(i).getHexItems().at(j) << " ";
+                }
