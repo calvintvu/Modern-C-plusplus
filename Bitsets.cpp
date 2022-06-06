@@ -203,7 +203,7 @@ int main(){
 	// Example3();
 	// cout << white << "---Robot---\n";
 	// exampleRobot();
-	cout << white << "Standard Move Operations in Swap" << endl;
+	cout << white << "Standard Move Operations" << endl;
 	Opcode o = Opcode(123, "first");
 	Opcode p = Opcode(456, "second");
 	cout << yellow << "Object 1: " << o._bit << " " << o._text;

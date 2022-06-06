@@ -53,9 +53,10 @@ public:
 	Priority_Queue() { }
 	shared_ptr<Node> top()
 	{
-		if (vdata.size() > 0)
-			return vdata[0];
-		return *vdata.end();
+		// if (vdata.size() > 0)
+		// 	return vdata[0];
+		// return vdata.end()->get();
+        return vdata[0];
 	}
 	int size() { return vdata.size(); }
 	bool empty() { return vdata.size() < 1; }

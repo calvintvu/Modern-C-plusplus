@@ -24,7 +24,10 @@ public:
         base = move(make_unique<vector<int>>(size));
         // for (int i = 0; i < size; i++)
         //     base->at(i) = c.base->at(i);
-        copy(c.base->begin(), c.base->end(), base->begin());
+        copy(c.base->begin(), c.base->end(), base->begin()); 
+        /*
+        Opportunity to copy the vector using a stl algorithm
+        */
     }
     void allocate(int c)
     {
@@ -34,6 +37,9 @@ public:
         //     base->at(i) = 0;
         // fill(base->begin(),base->end(),0);
         generate(base->begin(), base->end(), []() {return 0;});
+        /*
+        Opportunity to fill the vector using a stl algorithm with a lambda expression
+        */
 
     }
     void pop()
@@ -43,6 +49,9 @@ public:
         // size--;
         // base->erase(base->begin());
         remove_if(base->begin(), base->end(), [&](auto i) { return i == base->at(0);});
+        /*
+        Opportunity to remove an element from the vector using a stl algorithm with a lambda expression
+        */
         size--;
     }
     void set(int v, int offset) { base->at(offset) = v; size++; }
@@ -51,6 +60,9 @@ public:
     // int begin() { return base->at(0); }
     pair<int, int> length_begin() const{
         return make_pair(size, base->at(0));
+        /*
+        Opportunity to pair two accessors with a tuple
+        */
     }
     int end() { return base->at(size - 1); }
     void push(int t) { set(t, size); }
@@ -64,10 +76,19 @@ class Trescence
     // int f[MAXS];
     // vector<int> f;
     tuple<vector<int>,vector<int>> out_f;
+    /*
+    Opportunity to pair vectors in a tuple
+    */
     // int g[MAXS][MAXC];
     vector<vector<int>> g;
+    /*
+    Modify array into vectors
+    */
     // string* arr;
     unique_ptr<vector<string>> arr;
+    /*
+    Usage of smart pointers
+    */
     int key;
     int states = 1;
 public:
@@ -76,8 +97,8 @@ public:
         get<0>(out_f).reserve(MAXS);
         get<1>(out_f).reserve(MAXS);
         g = vector<vector<int>>(MAXC , vector<int> (MAXS, -1));
-        arr =  move(make_unique<vector<string>>(get<0>(t)));
-        key = static_cast<int>(get<1>(t));
+        arr =  move(make_unique<vector<string>>(get<0>(t)));                    // move pointer
+        key = static_cast<int>(get<1>(t));                                      // casting
         memset(&get<0>(out_f)[0], 0, static_cast<int>(sizeof get<0>(out_f)));
         // memset(g, -1, sizeof g);
         for (int i = 0; i < key; ++i) 
@@ -96,7 +117,10 @@ public:
         // for (int ch = 0; ch < MAXC; ++ch)
         //     if (g[0][ch] == -1)
         //         g[0][ch] = 0;
-        replace_if(g[0].begin(), g[0].end(), [&](auto i){return i == -1;}, 0);
+        replace_if(g[0].begin(), g[0].end(), [&](auto i){return i == -1;}, 0); 
+        /*
+        Opportunity to replace elements using a stl algorithm and lambda
+        */
         memset(&get<1>(out_f)[0], -1, static_cast<int>(sizeof get<1>(out_f)));
         Minimum min(MAXS);
         for (int ch = 0; ch < MAXC; ++ch) 
@@ -148,8 +172,8 @@ public:
                 if (get<0>(out_f)[currentState] & (1 << j)) 
                 {
                     auto word = find_if(arr->begin(), arr->end(),
-                    [&](string s) -> bool{return s.compare(arr->at(j))==0;});
-
+                    [&](string s) -> bool{return s.compare(arr->at(j))==0;}); 
+                    //stl algorithm and lambda
                     cout << "Word " << word->data() << " appears from "
                         << i - word->size() + 1 << " to " << i << endl;
                 }

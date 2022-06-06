@@ -1,2 +1,2 @@
-while (g[answer][ch] == -1)
-            answer = f[answer];
+    // string binary_str("100001001");
+    // bitset<9> set(binary_str);  
