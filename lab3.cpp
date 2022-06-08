@@ -11,6 +11,10 @@
 #include <map>
 #include <bitset>
 #include <sstream>
+#include <queue>
+#include <thread>
+#include <mutex>
+#include <random>
 using namespace std;
 
 class Product{
@@ -34,7 +38,7 @@ class Product{
 class Cart{
     private:
         string cartNum;
-        float total_amt;
+        float total_amt = 0;
         vector<string> hex_items;
         vector<string> items_receipt;
     public:
@@ -43,16 +47,39 @@ class Cart{
             hex_items=v;
         }
         string getCartNum(){return cartNum;}
-        vector<string> getHexItems(){return hex_items;}
-
+        vector<string>& getHexItems(){return hex_items;}
+        void addToReceipt(Product p){
+            stringstream stream;  
+            stream.precision(2);
+            stream << fixed;
+            stream<<p.getProductPrice();  
+            string temp = p.getProductName() + ": $" + stream.str();
+            items_receipt.push_back(temp);
+            total_amt += p.getProductPrice();
+        }
+        void printReceipt(){
+            cout << cartNum << endl;
+            cout << "-------" << endl;
+            for(int i = 0; i<items_receipt.size();i++){
+                cout << items_receipt.at(i) << endl;
+            }
+            cout << "==============================" << endl;
+            cout << "Total: $" << total_amt << endl << endl;
+        }
+        void popItem(){
+            hex_items.erase(hex_items.begin());
+        }
 };
 
 class Database{
     private:
         map<string, Product> product_database;
         vector<Cart> carts_line;
+        vector<queue<Cart>> carts_queue;
     public:
         map<string, Product> getMap(){return product_database;}
+        vector<Cart>& getCarts(){return carts_line;}
+        vector<queue<Cart>>& getCartQueue(){return carts_queue;}
         void insertProduct(string b, Product p){
             product_database.insert(make_pair(b, p));
         }
@@ -74,7 +101,19 @@ class Database{
             }
         }
         Product findProduct(string s){
+            s.erase(remove_if(s.begin(), s.end(), ::isspace), s.end());
             return product_database.find(s)->second;
+        }
+        void fillQueues(){
+            srand(time(NULL));
+            carts_queue.resize(5);
+            int index = 0;
+            for(int i = 0; i < carts_line.size()-1;i++){
+                if(index == 5){index=0;}
+                carts_queue.at(index).push(carts_line.at(i));
+                index++;
+            }
+
         }
 };
 
@@ -107,6 +146,7 @@ class File{
                                     barcode = barcode.erase(0,9);
                                 }
                                 Product p = Product(name,barcode,price);
+                                temp.erase(remove_if(temp.begin(), temp.end(), ::isspace), temp.end());
                                 d.insertProduct(temp, p);
                                 temp = "";
                             }
@@ -121,43 +161,77 @@ class File{
             ifstream fin;
             fin.open(s, ios::in);
             vector<string> hexes;
-            string line, word, temp;
-            string cartnum;
-            while (true) {
-                getline(fin, line);
-                cartnum = line;
-                getline(fin, line);
-                stringstream s(line);
-                while (getline(s, word, ',')) {
-                    if(word.length()>0 || word != ""){hexes.push_back(word);}
+            string line, word, temp, cartnum;
+            while(true){
+                regex pattern("[,]+");
+                smatch m;
+                getline(fin,line);
+                cartnum=line;
+                getline(fin,line);
+                const string s = line;
+                sregex_token_iterator iter(s.begin(), s.end(), pattern, -1);
+                sregex_token_iterator end;
+                vector<string> tokens(iter, end);
+                for (auto &s: tokens) {
+                    hexes.push_back(s);
                 }
                 Cart c = Cart(cartnum,hexes);
                 d.insertCart(c);
                 hexes.clear();
                 if(fin.eof()){break;}
             }
+
             fin.close();
         }
 };
 
-
 class QueueManager{
     private:
-        vector<Cart> carts;
-        vector<vector<Cart>> queues;
+        mutex mutex;
+        bool done = false;
     public:
+        void processBarcode(Database& d, int index){
+            mutex.lock();
+            if(d.getCartQueue().at(index).front().getHexItems().size()>0){
+            string s = d.getCartQueue().at(index).front().getHexItems().front();
+            Product p = d.findProduct(s);
+            d.getCartQueue().at(index).front().addToReceipt(p);
+            d.getCartQueue().at(index).front().popItem();
+            }
+            if(d.getCartQueue().at(index).front().getHexItems().empty()){
+                d.getCartQueue().at(index).front().printReceipt();
+                d.getCartQueue().at(index).pop();
+            }
+            mutex.unlock();
+        }
+        void runThreads(Database& d){
+            vector<thread> threads;
+            for(int i=0;i<d.getCartQueue().size();i++){
+                if(d.getCartQueue().at(i).size()==0){
+                    d.getCartQueue().erase(d.getCartQueue().begin()+i);
+                }
+                if(d.getCartQueue().size()==0){
+                    done = true;
+                    break;
+                }
+                threads.push_back(thread(&QueueManager::processBarcode, this, ref(d), i));
+            }
+            for(thread& t: threads){t.join();}
+        }
+        void run(Database& d){
+            while(done==false){
+                runThreads(d); 
+            }
+        }
 };
-
 
 int main(){
     Database d;
     File f;
     f.readProducts(d, "ProductPrice.xml");
-    // d.printProduct();
     f.readCarts(d, "Carts.csv");
-    // d.printCarts();
-
-    // Product test = d.findProduct("00D1061090C1190");
-    // cout << test.getProductName() <<" "<<test.getProductPrice() <<  endl;
-
+    QueueManager q;
+    d.fillQueues();
+    q.run(d);
+    return 0;
 }
